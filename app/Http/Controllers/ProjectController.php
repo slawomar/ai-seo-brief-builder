@@ -33,7 +33,7 @@ class ProjectController extends Controller
             ...$data,
         ]);
 
-        return redirect()->route('projects.show', $project);
+        return redirect()->route('projects.show', $project)->with('success', 'Project created.');
     }
 
     public function show(Project $project)

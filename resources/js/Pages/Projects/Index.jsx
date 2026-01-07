@@ -1,20 +1,36 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 
 export default function Index({ projects }) {
-  const { data, setData, post, processing, errors } = useForm({
+  const { flash } = usePage().props;
+
+  const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
     name: '',
     description: '',
   });
 
   const submit = (e) => {
     e.preventDefault();
-    post(route('projects.store'));
+    post(route('projects.store'), {
+      preserveScroll: true,
+      onSuccess: () => {
+        reset();
+        clearErrors();
+      },
+    });
   };
 
   return (
     <AuthenticatedLayout>
       <Head title="Projects" />
+
+      {flash?.success && (
+        <div className="max-w-5xl mx-auto px-6 pt-6">
+          <div className="rounded border border-green-200 bg-green-50 text-green-800 px-4 py-2">
+            {flash.success}
+          </div>
+        </div>
+      )}
 
       <div className="max-w-5xl mx-auto p-6 space-y-6">
         <div className="bg-white rounded-xl shadow p-6">
@@ -38,9 +54,13 @@ export default function Index({ projects }) {
                 value={data.description}
                 onChange={(e) => setData('description', e.target.value)}
               />
+              {errors.description && (
+                <div className="text-sm text-red-600 mt-1">{errors.description}</div>
+              )}
             </div>
 
             <button
+              type="submit"
               className="px-4 py-2 rounded bg-black text-white disabled:opacity-50"
               disabled={processing}
             >
